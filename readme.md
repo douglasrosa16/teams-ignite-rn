@@ -5,3 +5,8 @@ npx creact-react-app
 
 Bibliotecas utilizadas:
 npx expo install react-native-svg
+
+Navegação - Instalando Stack Navigator
+- npm install @react-navigation/native
+- npx expo install react-native-screens react-native-safe-area-context
+- npm install @react-navigation/native-stack
