@@ -14,3 +14,7 @@ Navegação - Instalando Stack Navigator
 Área Segura do App
  - react-native-safe-area-context
  - É responsável que os nossos elementos fiquem visível na área segura do dispositivo
+
+ Async Storage
+ npx expo install @react-native-async-storage/async-storage
+  - Responsável por armazenar string no dispositivo
