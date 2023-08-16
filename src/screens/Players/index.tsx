@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, Alert } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 
 import { Header } from '@components/Header';
@@ -18,12 +18,19 @@ type RouteParams = {
 }
 
 export function Players() {
+  const [newPlayerName, setNewPlayerName] = useState('');
   const [team, setTeam] = useState<string>('Time A')
   const [players, setPlayers] = useState<string[]>([]);
 
   const route = useRoute();
 
   const { group } = route.params as RouteParams;
+
+  async function handleAddPlayer() {
+    if (newPlayerName.trim().length === 0) {
+      return Alert.alert('Nova pessoa', 'Informe o nome da pessoa para adicionar.');
+    }
+  }
 
   return (
     <Container>
@@ -36,12 +43,14 @@ export function Players() {
 
       <Form>
         <Input
+          onChangeText={setNewPlayerName}
           placeholder="Nome da pessoa"
           autoCorrect={false}
         />
 
         <ButtonIcon
           icon="add"
+          onPress={handleAddPlayer}
         />
       </Form>
       <HeaderList>
@@ -62,13 +71,13 @@ export function Players() {
         </NumberOfPlayers>
       </HeaderList>
 
-      <FlatList 
+      <FlatList
         data={players}
         keyExtractor={item => item}
         renderItem={({ item }) => (
-          <PlayerCard 
+          <PlayerCard
             name={item}
-            onRemove={() => {}}
+            onRemove={() => { }}
           />
         )}
         ListEmptyComponent={() => (
@@ -79,11 +88,11 @@ export function Players() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           { paddingBottom: 100 },
-          players.length === 0 && { flex: 1}
+          players.length === 0 && { flex: 1 }
         ]}
       />
 
-      <Button 
+      <Button
         title="Remover turma"
         type="SECONDARY"
       />
