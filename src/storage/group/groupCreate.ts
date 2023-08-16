@@ -5,7 +5,7 @@ import { groupsGetAll } from './groupsGetAll';
 
 export async function groupCreate(newGroup: string){
   try {
-    const storedGroups = await groupsGetAll();
+     const storedGroups = await groupsGetAll();
 
     const storage = JSON.stringify([...storedGroups, newGroup]);
 
