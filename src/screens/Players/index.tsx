@@ -2,6 +2,11 @@ import { useState } from 'react';
 import { FlatList, Alert } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 
+import { playerAddByGroup } from '@storage/player/playerAddByGroup';
+import { playerGetByGroup } from '@storage/player/playersGetByGroup';
+import { AppError } from '@utils/AppError';
+
+//Componentes
 import { Header } from '@components/Header';
 import { Hightlight } from '@components/Hightlight';
 import { ButtonIcon } from '@components/ButtonIcon';
@@ -29,6 +34,26 @@ export function Players() {
   async function handleAddPlayer() {
     if (newPlayerName.trim().length === 0) {
       return Alert.alert('Nova pessoa', 'Informe o nome da pessoa para adicionar.');
+    }
+
+    const newPlayer = {
+      name: newPlayerName,
+      team
+    }
+
+    try {
+      await playerAddByGroup(newPlayer, group);
+
+      const players = await playerGetByGroup(group);
+      console.log(players)
+
+    } catch (error) {
+      if (error instanceof AppError) {
+        Alert.alert('Nova pessoa', error.message);
+      } else {
+        console.log(error);
+        Alert.alert('Nova pessoa', 'Não foi possível adicionar');
+      }
     }
   }
 
