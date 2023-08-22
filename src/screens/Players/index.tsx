@@ -14,6 +14,7 @@ import { PlayerStorageDTO } from '@storage/player/PlayerStorageDTO';
 import { AppError } from '@utils/AppError';
 
 //Componentes
+import { Loading } from '@components/Loading';
 import { Header } from '@components/Header';
 import { Hightlight } from '@components/Hightlight';
 import { ButtonIcon } from '@components/ButtonIcon';
@@ -25,11 +26,13 @@ import { Button } from '@components/Button';
 
 import { Container, Form, HeaderList, NumberOfPlayers } from './styles';
 
+
 type RouteParams = {
   group: string;
 }
 
 export function Players() {
+  const [isLoading, setIsLoading] = useState(true);
   const [newPlayerName, setNewPlayerName] = useState('');
   const [team, setTeam] = useState<string>('Time A')
   const [players, setPlayers] = useState<PlayerStorageDTO[]>([]);
@@ -53,7 +56,7 @@ export function Players() {
 
     try {
       await playerAddByGroup(newPlayer, group);
-      
+
       newPlayerNameInputRef.current?.blur();
 
       setNewPlayerName('');
@@ -72,25 +75,30 @@ export function Players() {
 
   async function fetchPlayersByTeam() {
     try {
+      setIsLoading(true);
+
       const playersByTeam = await playersGetByGroupAndTeam(group, team);
       setPlayers(playersByTeam);
+      
     } catch (error) {
       console.log(error);
-      Alert.alert('Pessoas','Não foi possível carregar as pessoas do time selecionado');
+      Alert.alert('Pessoas', 'Não foi possível carregar as pessoas do time selecionado');
+    } finally {
+      setIsLoading(false);
     }
   }
 
-  async function handlePlayerRemove(playerName : string) {
+  async function handlePlayerRemove(playerName: string) {
     try {
       await playerRemoveByGroup(playerName, group);
       fetchPlayersByTeam();
     } catch (error) {
       console.log(error);
-      Alert.alert('Remover pessoa','Não foi possível remover essa pessoa')
-    }    
+      Alert.alert('Remover pessoa', 'Não foi possível remover essa pessoa')
+    }
   }
 
-  async function groupRemove(){
+  async function groupRemove() {
     try {
       await groupRemoveByName(group);
 
@@ -101,19 +109,19 @@ export function Players() {
     }
   }
 
-  async function handleGroupRemove(){
+  async function handleGroupRemove() {
     Alert.alert(
       'Remover',
-      'Deseja remover o grupo?',
+      'Deseja remover a turma?',
       [
-        { text : 'Não', style: 'cancel'},
-        { text : 'Sim', onPress: () => groupRemove()}
+        { text: 'Não', style: 'cancel' },
+        { text: 'Sim', onPress: () => groupRemove() }
       ]
     )
   }
   useEffect(() => {
-    fetchPlayersByTeam();    
-  },[team])
+    fetchPlayersByTeam();
+  }, [team])
 
   return (
     <Container>
@@ -157,27 +165,30 @@ export function Players() {
           {players.length}
         </NumberOfPlayers>
       </HeaderList>
+      {
+        isLoading ? <Loading /> :
+          <FlatList
+            data={players}
+            keyExtractor={item => item.name}
+            renderItem={({ item }) => (
+              <PlayerCard
+                name={item.name}
+                onRemove={() => handlePlayerRemove(item.name)}
+              />
+            )}
+            ListEmptyComponent={() => (
+              <ListEmpty
+                message="Não há pessoas nesse time"
+              />
+            )}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={[
+              { paddingBottom: 100 },
+              players.length === 0 && { flex: 1 }
+            ]}
+          />
+      }
 
-      <FlatList
-        data={players}
-        keyExtractor={item => item.name}
-        renderItem={({ item }) => (
-          <PlayerCard
-            name={item.name}
-            onRemove={() => handlePlayerRemove(item.name)}
-          />
-        )}
-        ListEmptyComponent={() => (
-          <ListEmpty
-            message="Não há pessoas nesse time"
-          />
-        )}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          { paddingBottom: 100 },
-          players.length === 0 && { flex: 1 }
-        ]}
-      />
 
       <Button
         title="Remover turma"
