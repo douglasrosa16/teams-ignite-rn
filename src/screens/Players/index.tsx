@@ -6,7 +6,7 @@ import { useRoute } from '@react-navigation/native';
 import { playerAddByGroup } from '@storage/player/playerAddByGroup';
 import { playerGetByGroup } from '@storage/player/playersGetByGroup';
 import { playersGetByGroupAndTeam } from '@storage/player/playerGetByGroupAndTeam';
-
+import { playerRemoveByGroup } from '@storage/player/playerRemoveByGroup';
 import { PlayerStorageDTO } from '@storage/player/PlayerStorageDTO';
 
 import { AppError } from '@utils/AppError';
@@ -22,6 +22,7 @@ import { ListEmpty } from '@components/ListEmpty';
 import { Button } from '@components/Button';
 
 import { Container, Form, HeaderList, NumberOfPlayers } from './styles';
+
 
 type RouteParams = {
   group: string;
@@ -74,6 +75,16 @@ export function Players() {
       console.log(error);
       Alert.alert('Pessoas','Não foi possível carregar as pessoas do time selecionado');
     }
+  }
+
+  async function handlePlayerRemove(playerName : string) {
+    try {
+      await playerRemoveByGroup(playerName, group);
+      fetchPlayersByTeam();
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Remover pessoa','Não foi possível remover essa pessoa')
+    }    
   }
 
   useEffect(() => {
@@ -129,7 +140,7 @@ export function Players() {
         renderItem={({ item }) => (
           <PlayerCard
             name={item.name}
-            onRemove={() => { }}
+            onRemove={() => handlePlayerRemove(item.name)}
           />
         )}
         ListEmptyComponent={() => (
